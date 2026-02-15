@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NutriCheck — AI-powered food label reader and health analyzer. Upload nutrition labels for instant health scoring.">
+    <title>NutriCheck — Food Label Reader & Health Analyzer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- ===== SIDEBAR NAV ===== -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">🍎</div>
+            <h1>NutriCheck</h1>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <a href="#" class="nav-link active" data-section="upload">
+                    <span class="nav-icon">📷</span>
+                    <span>Analyze</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link" data-section="history">
+                    <span class="nav-icon">📋</span>
+                    <span>History</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link" data-section="compare">
+                    <span class="nav-icon">⚖️</span>
+                    <span>Compare</span>
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <p>AI-Powered Analysis</p>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+        <!-- HEADER -->
+        <header class="top-bar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <div class="header-info">
+                <h2 id="pageTitle">Analyze Label</h2>
+                <p class="header-subtitle">Upload a food label image to analyze its nutritional content</p>
+            </div>
+        </header>
+
+        <!-- ===== UPLOAD SECTION ===== -->
+        <section class="section" id="section-upload">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-content">
+                    <div class="upload-icon">📸</div>
+                    <h3>Drop your food label image here</h3>
+                    <p>or click to browse files</p>
+                    <span class="upload-hint">Supports PNG, JPG, JPEG, BMP, WebP (max 16MB)</span>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" hidden>
+            </div>
+
+            <!-- Image preview -->
+            <div class="image-preview-container hidden" id="previewContainer">
+                <div class="preview-card glass-card">
+                    <img id="previewImage" alt="Uploaded food label">
+                    <div class="preview-actions">
+                        <button class="btn btn-primary" id="analyzeBtn">
+                            <span class="btn-icon">🔍</span> Analyze Label
+                        </button>
+                        <button class="btn btn-ghost" id="clearBtn">
+                            <span class="btn-icon">✕</span> Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading-overlay hidden" id="loadingOverlay">
+                <div class="loading-content">
+                    <div class="spinner"></div>
+                    <h3>Analyzing your food label...</h3>
+                    <p class="loading-step" id="loadingStep">Preprocessing image...</p>
+                </div>
+            </div>
+
+            <!-- ===== RESULTS DASHBOARD ===== -->
+            <div class="results-section hidden" id="resultsSection">
+                <!-- Score + Verdict -->
+                <div class="results-header">
+                    <div class="score-card glass-card">
+                        <h3>Health Score</h3>
+                        <div class="gauge-container">
+                            <svg class="gauge" viewBox="0 0 200 120" id="scoreGauge">
+                                <defs>
+                                    <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#E17055"/>
+                                        <stop offset="50%" style="stop-color:#FDCB6E"/>
+                                        <stop offset="100%" style="stop-color:#00B894"/>
+                                    </linearGradient>
+                                </defs>
+                                <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100" 
+                                      fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12" stroke-linecap="round"/>
+                                <path class="gauge-fill" d="M 20 100 A 80 80 0 0 1 180 100" 
+                                      fill="none" stroke="url(#gaugeGradient)" stroke-width="12" stroke-linecap="round"
+                                      id="gaugeFill"/>
+                                <text x="100" y="85" text-anchor="middle" class="gauge-score" id="gaugeScore">0</text>
+                                <text x="100" y="105" text-anchor="middle" class="gauge-label">/ 100</text>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="verdict-card glass-card" id="verdictCard">
+                        <div class="verdict-badge" id="verdictBadge">—</div>
+                        <p class="verdict-explanation" id="verdictExplanation"></p>
+                    </div>
+                </div>
+
+                <!-- Nutrients Grid -->
+                <div class="nutrients-grid" id="nutrientsGrid">
+                    <!-- Filled dynamically -->
+                </div>
+
+                <!-- Recommendation -->
+                <div class="recommendation-card glass-card" id="recommendationCard">
+                    <h3>💡 Dietary Recommendation</h3>
+                    <p id="recommendationText"></p>
+                </div>
+
+                <!-- Actions -->
+                <div class="result-actions">
+                    <button class="btn btn-primary" id="downloadPdfBtn">
+                        <span class="btn-icon">📄</span> Download PDF Report
+                    </button>
+                    <button class="btn btn-secondary" id="newAnalysisBtn">
+                        <span class="btn-icon">➕</span> New Analysis
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== HISTORY SECTION ===== -->
+        <section class="section hidden" id="section-history">
+            <div class="history-controls">
+                <h3>Analysis History</h3>
+                <button class="btn btn-ghost" id="refreshHistoryBtn">🔄 Refresh</button>
+            </div>
+            <div class="history-grid" id="historyGrid">
+                <div class="empty-state">
+                    <span class="empty-icon">📋</span>
+                    <p>No analyses yet. Upload a food label to get started!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== COMPARE SECTION ===== -->
+        <section class="section hidden" id="section-compare">
+            <div class="compare-controls">
+                <h3>Compare Products</h3>
+                <p class="compare-hint">Select 2 or more products from your history to compare</p>
+            </div>
+            <div class="compare-selection" id="compareSelection">
+                <!-- Checkboxes of history items -->
+            </div>
+            <button class="btn btn-primary compare-btn hidden" id="compareBtn">
+                <span class="btn-icon">⚖️</span> Compare Selected
+            </button>
+            <div class="compare-results hidden" id="compareResults">
+                <!-- Comparison cards -->
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/history.js"></script>
+    <script src="/static/js/comparison.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
